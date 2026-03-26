@@ -1,0 +1,64 @@
+@layer components {
+    /* Quill Toolbar */
+    .ql-toolbar.ql-snow {
+        @apply border-0 border-b border-gray-200 bg-gray-50 px-4 py-3;
+    }
+
+    .ql-container.ql-snow {
+        @apply border-0 text-base;
+    }
+
+    .ql-editor {
+        @apply min-h-[200px] text-gray-700 leading-relaxed;
+    }
+
+    .ql-editor.ql-blank::before {
+        @apply text-gray-400 not-italic;
+    }
+
+    /* Toolbar buttons */
+    .ql-snow .ql-stroke {
+        @apply stroke-gray-500;
+    }
+
+    .ql-snow .ql-fill {
+        @apply fill-gray-500;
+    }
+
+    .ql-snow .ql-picker {
+        @apply text-gray-500;
+    }
+
+    /* Hover & Active states */
+    .ql-snow.ql-toolbar button:hover,
+    .ql-snow .ql-toolbar button:hover,
+    .ql-snow.ql-toolbar button:focus,
+    .ql-snow .ql-toolbar button:focus,
+    .ql-snow.ql-toolbar button.ql-active,
+    .ql-snow .ql-toolbar button.ql-active {
+        @apply text-indigo-600;
+    }
+
+    .ql-snow.ql-toolbar button:hover .ql-stroke,
+    .ql-snow .ql-toolbar button:hover .ql-stroke,
+    .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+    .ql-snow .ql-toolbar button.ql-active .ql-stroke {
+        @apply stroke-indigo-600;
+    }
+
+    .ql-snow.ql-toolbar button:hover .ql-fill,
+    .ql-snow .ql-toolbar button:hover .ql-fill,
+    .ql-snow.ql-toolbar button.ql-active .ql-fill,
+    .ql-snow .ql-toolbar button.ql-active .ql-fill {
+        @apply fill-indigo-600;
+    }
+
+    /* Dropdown hover */
+    .ql-snow .ql-picker-options {
+        @apply bg-white border border-gray-200 shadow-lg rounded-lg;
+    }
+
+    .ql-snow .ql-picker-item {
+        @apply hover:bg-gray-100 rounded;
+    }
+}

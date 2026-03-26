@@ -1,0 +1,99 @@
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 600px;
+  gap: 20px;
+  padding: 40px 20px;
+  font-family: "Poppins", sans-serif;
+}
+
+.hero-text {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.head span {
+  font-size: 50px;
+  font-weight: 500;
+  color: #1691fd;
+  position: relative;
+}
+
+.hero-text p {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.primary-btn {
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: none;
+  background-color: #1691fd;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.play {
+  height: 40px;
+  width: 40px;
+  background-color: #ebab0c;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.bullets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.b {
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.b span:first-child {
+  background-color: #1691fd;
+  color: white;
+  padding: 3px 6px;
+  border-radius: 50%;
+}
+
+.hero-img {
+  width: 50%;
+}
+
+.hero-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.acc1 {
+  position: absolute;
+  width: 40px;
+  transform: rotate(180deg);
+  top: -10px;
+  left: -20px;
+}
+
+.acc2 {
+  position: absolute;
+  width: 60px;
+  bottom: -30px;
+  right: -45px;
+}
