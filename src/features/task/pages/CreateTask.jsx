@@ -1,7 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { createTask } from '../service/taskService';
-import { ArrowLeft, Calendar, GitBranch, FileText, CheckCircle, X, AlertCircle } from 'lucide-react';
+import { getAllUsers } from '../../project/services/userService';
+import { 
+  ArrowLeft, 
+  Calendar, 
+  GitBranch, 
+  FileText, 
+  CheckCircle, 
+  X, 
+  AlertCircle,
+  Users,
+  Plus,
+  Trash2
+} from 'lucide-react';
 
 const CreateTask = () => {
   const { threadId } = useParams();
@@ -11,12 +23,39 @@ const CreateTask = () => {
     title: '',
     description: '',
     gitLink: '',
-    targetDate: ''
+    targetDate: '',
+    assignedUsers: [] // Array to store assigned user IDs
   });
   
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [fetchingUsers, setFetchingUsers] = useState(true);
+  const [selectedUserId, setSelectedUserId] = useState('');
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setFetchingUsers(true);
+      const response = await getAllUsers();
+      console.log("Users response:", response);
+      
+      if (response && response.success) {
+        setUsers(response.data || []);
+      } else {
+        setUsers([]);
+      }
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      setError("Failed to load users list");
+    } finally {
+      setFetchingUsers(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,6 +64,41 @@ const CreateTask = () => {
       [name]: value
     }));
     if (error) setError('');
+  };
+
+  const handleAddUser = () => {
+    if (!selectedUserId) {
+      setError('Please select a user to assign');
+      return;
+    }
+    
+    // Check if user is already assigned
+    if (formData.assignedUsers.includes(parseInt(selectedUserId))) {
+      setError('This user is already assigned to the task');
+      return;
+    }
+    
+    // Add user to assigned list
+    setFormData(prev => ({
+      ...prev,
+      assignedUsers: [...prev.assignedUsers, parseInt(selectedUserId)]
+    }));
+    
+    // Reset selected user
+    setSelectedUserId('');
+    setError('');
+  };
+
+  const handleRemoveUser = (userId) => {
+    setFormData(prev => ({
+      ...prev,
+      assignedUsers: prev.assignedUsers.filter(id => id !== userId)
+    }));
+  };
+
+  const getUserName = (userId) => {
+    const user = users.find(u => u.id === userId);
+    return user ? `${user.firstName} ${user.lastName}` : `User #${userId}`;
   };
 
   const validateForm = () => {
@@ -38,6 +112,10 @@ const CreateTask = () => {
     }
     if (!formData.targetDate) {
       setError('Target date is required');
+      return false;
+    }
+    if (formData.assignedUsers.length === 0) {
+      setError('Please assign at least one user to this task');
       return false;
     }
     
@@ -63,7 +141,8 @@ const CreateTask = () => {
         title: formData.title.trim(),
         description: formData.description.trim(),
         gitLink: formData.gitLink.trim() || null,
-        targetDate: formData.targetDate
+        targetDate: formData.targetDate,
+        assignedUsers: formData.assignedUsers // Send assigned users array
       };
       
       console.log("Creating task with data:", taskData);
@@ -79,7 +158,8 @@ const CreateTask = () => {
           title: '',
           description: '',
           gitLink: '',
-          targetDate: ''
+          targetDate: '',
+          assignedUsers: []
         });
         
         // Redirect after 2 seconds
@@ -110,6 +190,17 @@ const CreateTask = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Task Created!</h2>
           <p className="text-gray-600 mb-4">Your task has been successfully created.</p>
           <p className="text-sm text-gray-500">Redirecting to thread...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (fetchingUsers) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#002d74] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading users...</p>
         </div>
       </div>
     );
@@ -174,6 +265,72 @@ const CreateTask = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#002d74] focus:border-transparent transition resize-y"
                 disabled={loading}
               />
+            </div>
+
+            {/* Assign Users Section */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Assign Users <span className="text-red-500">*</span>
+              </label>
+              
+              {/* User Selection Dropdown */}
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
+                  <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <select
+                    value={selectedUserId}
+                    onChange={(e) => setSelectedUserId(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#002d74] focus:border-transparent bg-white"
+                    disabled={loading}
+                  >
+                    <option value="">Select a user to assign</option>
+                    {users.map(user => (
+                      <option key={user.id} value={user.id}>
+                        {user.firstName} {user.lastName} ({user.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddUser}
+                  disabled={loading}
+                  className="px-4 py-2 bg-[#002d74] text-white rounded-lg hover:bg-[#001a4d] transition disabled:opacity-50 flex items-center"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add
+                </button>
+              </div>
+
+              {/* Assigned Users List */}
+              {formData.assignedUsers.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <p className="text-xs font-medium text-gray-500">Assigned Users:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.assignedUsers.map(userId => (
+                      <div
+                        key={userId}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm"
+                      >
+                        <Users className="w-3 h-3" />
+                        <span>{getUserName(userId)}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveUser(userId)}
+                          className="hover:text-red-600 transition"
+                          disabled={loading}
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <p className="text-xs text-gray-500 mt-1">
+                You can assign multiple users to this task. They will be notified about the task.
+              </p>
             </div>
 
             {/* Git/PR Link */}
@@ -265,6 +422,7 @@ const CreateTask = () => {
           </h3>
           <ul className="text-xs text-blue-700 space-y-1 list-disc list-inside">
             <li>Tasks help break down threads into actionable items</li>
+            <li>You can assign multiple users to a task for collaboration</li>
             <li>Each task can be linked to a GitHub/GitLab PR for tracking</li>
             <li>Set a target date to track deadlines for task completion</li>
             <li>Tasks will appear in the thread details page</li>

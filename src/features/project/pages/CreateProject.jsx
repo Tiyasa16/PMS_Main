@@ -186,7 +186,7 @@ const CreateProject = () => {
 
       // Append file if selected
       if (file) {
-        formData.append('file', file)
+        formData.append('user_manual', file)
       }
 
       // Use axios with upload progress tracking
